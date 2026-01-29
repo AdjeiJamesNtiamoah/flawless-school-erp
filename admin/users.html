@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Management | Admin</title>
+  <style>
+    body { font-family: Arial; background: #f1f5f9; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    input, select, button {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background: white;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+    th { background: #0f172a; color: white; }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  if (!currentUser || currentUser.role !== "admin") {
+    location.href = "../auth/login.html";
+  }
+</script>
+
+<h2>Admin – User Management</h2>
+
+<div class="card">
+  <h3>Create User</h3>
+
+  <input id="name" placeholder="Full Name">
+  <input id="email" placeholder="Email">
+  <input id="password" placeholder="Password">
+
+  <select id="role">
+    <option value="">Select Role</option>
+    <option value="hr">HR</option>
+    <option value="teacher">Teacher</option>
+    <option value="student">Student</option>
+    <option value="parent">Parent</option>
+  </select>
+
+  <button onclick="createUser()">Create User</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody id="userTable"></tbody>
+</table>
+
+<script src="../core/datastore.js"></script>
+<script>
+
+function createUser() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const role = document.getElementById("role").value;
+
+  if (!name || !email || !password || !role) {
+    alert("All fields are required");
+    return;
+  }
+
+  const db = JSON.parse(localStorage.getItem("DB"));
+
+  if (db.users.some(u => u.email === email)) {
+    alert("User already exists");
+    return;
+  }
+
+  const newUser = {
+    id: role.toUpperCase().slice(0,2) + Date.now(),
+    name,
+    email,
+    password,
+    role
+  };
+
+  db.users.push(newUser);
+  localStorage.setItem("DB", JSON.stringify(db));
+
+  alert("User created successfully");
+  loadUsers();
+}
+
+function loadUsers() {
+  const db = JSON.parse(localStorage.getItem("DB"));
+  const table = document.getElementById("userTable");
+  table.innerHTML = "";
+
+  db.users.forEach(u => {
+    table.innerHTML += `
+      <tr>
+        <td>${u.id}</td>
+        <td>${u.name}</td>
+        <td>${u.email}</td>
+        <td>${u.role}</td>
+      </tr>
+    `;
+  });
+}
+
+loadUsers();
+</script>
+
+</body>
+</html>
