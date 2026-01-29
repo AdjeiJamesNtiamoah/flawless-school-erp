@@ -22,6 +22,15 @@
     <a class="active" href="users.html">Users</a>
     <a href="#" onclick="logout()">Logout</a>
   </div>
+<script>
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+
+  document.querySelectorAll("[data-role]").forEach(item => {
+    if (!item.dataset.role.includes(user.role)) {
+      item.style.display = "none";
+    }
+  });
+</script>
 
   <!-- MAIN -->
   <div class="main">
