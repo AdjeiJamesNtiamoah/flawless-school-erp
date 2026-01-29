@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
 
@@ -12,24 +13,58 @@
   }
 </script>
 
-<h1>Admin Dashboard</h1>
-<p>Welcome, <b id="name"></b></p>
+<div class="layout">
 
-<ul>
-  <li><a href="users.html">Manage Users</a></li>
-  <li>Manage Classes</li>
-  <li>Reports</li>
-  <li>System Settings</li>
-</ul>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>Flawless ERP</h2>
+    <a class="active" href="admin-dashboard.html">Dashboard</a>
+    <a href="users.html">Users</a>
+    <a href="#">Classes</a>
+    <a href="#">Reports</a>
+    <a href="#">Settings</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
 
+  <!-- MAIN -->
+  <div class="main">
 
-<button onclick="logout()">Logout</button>
+    <div class="header">
+      <h1>Admin Dashboard</h1>
+      <p>Welcome, <b id="adminName"></b></p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Total Users</h3>
+        <h1 id="totalUsers">0</h1>
+      </div>
+      <div class="card">
+        <h3>Teachers</h3>
+        <h1 id="totalTeachers">0</h1>
+      </div>
+      <div class="card">
+        <h3>Students</h3>
+        <h1>0</h1>
+      </div>
+      <div class="card">
+        <h3>Parents</h3>
+        <h1>0</h1>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script src="../core/auth.js"></script>
 <script>
-  document.getElementById("name").textContent = user.name;
+  document.getElementById("adminName").textContent = user.name;
+
+  const db = JSON.parse(localStorage.getItem("DB"));
+  document.getElementById("totalUsers").textContent = db.users.length;
+  document.getElementById("totalTeachers").textContent =
+    db.users.filter(u => u.role === "teacher").length;
 </script>
 
 </body>
 </html>
-
