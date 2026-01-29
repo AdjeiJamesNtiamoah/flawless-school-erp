@@ -48,41 +48,89 @@
       <button onclick="createUser()">Create User</button>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-        </tr>
-      </thead>
-      <tbody id="userTable"></tbody>
-    </table>
+   <table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="userTable"></tbody>
+</table>
 
   </div>
 </div>
 
 <script src="../core/datastore.js"></script>
 <script src="../core/auth.js"></script>
+<script src="../core/datastore.js"></script>
+<script src="../core/auth.js"></script>
 <script>
+let editUserId = null;
 
 function createUser() {
   const db = JSON.parse(localStorage.getItem("DB"));
 
-  const user = {
-    id: Date.now(),
-    name: name.value,
-    email: email.value,
-    password: password.value,
-    role: role.value
-  };
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const role = document.getElementById("role").value;
 
-  if (!user.name || !user.email || !user.password || !user.role) {
+  if (!name || !email || !password || !role) {
     alert("Fill all fields");
     return;
   }
 
-  db.users.push(user);
+  // Prevent duplicate emails
+  if (db.users.some(u => u.email === email && u.id !== editUserId)) {
+    alert("Email already exists");
+    return;
+  }
+
+  if (editUserId) {
+    // UPDATE USER
+    const user = db.users.find(u => u.id === editUserId);
+    user.name = name;
+    user.email = email;
+    user.password = password;
+    user.role = role;
+    editUserId = null;
+  } else {
+    // CREATE USER
+    db.users.push({
+      id: Date.now(),
+      name,
+      email,
+      password,
+      role
+    });
+  }
+
+  localStorage.setItem("DB", JSON.stringify(db));
+  clearForm();
+  loadUsers();
+}
+
+function editUser(id) {
+  const db = JSON.parse(localStorage.getItem("DB"));
+  const user = db.users.find(u => u.id === id);
+
+  document.getElementById("name").value = user.name;
+  document.getElementById("email").value = user.email;
+  document.getElementById("password").value = user.password;
+  document.getElementById("role").value = user.role;
+
+  editUserId = id;
+}
+
+function deleteUser(id) {
+  if (!confirm("Are you sure you want to delete this user?")) return;
+
+  const db = JSON.parse(localStorage.getItem("DB"));
+  db.users = db.users.filter(u => u.id !== id);
+
   localStorage.setItem("DB", JSON.stringify(db));
   loadUsers();
 }
@@ -93,18 +141,35 @@ function loadUsers() {
   table.innerHTML = "";
 
   db.users.forEach(u => {
+    if (u.role === "admin") return; // protect admin
+
     table.innerHTML += `
       <tr>
         <td>${u.name}</td>
         <td>${u.email}</td>
         <td>${u.role}</td>
+        <td>
+          <button onclick="editUser(${u.id})">Edit</button>
+          <button onclick="deleteUser(${u.id})"
+            style="background:#dc2626;margin-left:5px;">
+            Delete
+          </button>
+        </td>
       </tr>
     `;
   });
 }
 
+function clearForm() {
+  name.value = "";
+  email.value = "";
+  password.value = "";
+  role.value = "";
+}
+
 loadUsers();
 </script>
+
 
 </body>
 </html>
