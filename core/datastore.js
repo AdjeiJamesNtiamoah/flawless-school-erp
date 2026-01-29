@@ -13,4 +13,3 @@ const DB = {
 if (!localStorage.getItem("DB")) {
   localStorage.setItem("DB", JSON.stringify(DB));
 }
-
