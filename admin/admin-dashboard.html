@@ -5,6 +5,8 @@
   <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
+<script src="../core/permissions.js"></script>
+<script>checkAccess("admin");</script>
 
 <script>
   const user = JSON.parse(localStorage.getItem("currentUser"));
