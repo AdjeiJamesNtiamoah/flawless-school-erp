@@ -1,23 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head><title>Student Dashboard</title></head>
+<head>
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
 <body>
 
 <script src="../core/firebase.js"></script>
 <script src="../core/auth.js"></script>
 
-<h1>Student Dashboard</h1>
-<button onclick="logout()">Logout</button>
+<div class="layout">
 
-<div id="info"></div>
+  <div class="sidebar">
+    <h2>Student</h2>
+    <a class="active">Dashboard</a>
+    <a onclick="logout()">Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <h1>Student Profile</h1>
+    </div>
+
+    <div class="card" id="info"></div>
+  </div>
+</div>
 
 <script>
 auth.onAuthStateChanged(user => {
   db.collection("students")
-    .where("studentEmail", "==", user.email)
+    .where("studentEmail","==",user.email)
     .onSnapshot(snapshot => {
       snapshot.forEach(doc => {
-        info.innerHTML = `<h3>${doc.data().name}</h3>`;
+        info.innerHTML = `
+          <h3>${doc.data().name}</h3>
+          <p>Class ID: ${doc.data().classId}</p>
+        `;
       });
     });
 });
