@@ -1,106 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Teacher Dashboard | Flawless ERP</title>
+  <title>Teacher Dashboard</title>
   <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
 
-<script src="../core/permissions.js"></script>
-<script>checkAccess("teacher");</script>
-
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h2>Teacher Panel</h2>
-    <a class="active" href="#">Dashboard</a>
-    <a href="register-student.html">Register Student</a>
-    <a href="#" onclick="logout()">Logout</a>
-  </div>
-
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- HEADER -->
-    <div class="header">
-      <div>
-        <h1>My Classes</h1>
-        <p id="today"></p>
-      </div>
-      <p>Welcome, <b id="teacherName"></b></p>
-    </div>
-
-    <!-- CLASSES -->
-    <div id="classes"></div>
-
-  </div>
-</div>
-
-<script src="../core/datastore.js"></script>
+<script src="../core/firebase.js"></script>
 <script src="../core/auth.js"></script>
 
+<h1>Teacher Dashboard</h1>
+<a href="register-student.html">Register Student</a>
+<button onclick="logout()">Logout</button>
+
+<div id="classes"></div>
+
 <script>
-const teacher = JSON.parse(localStorage.getItem("currentUser"));
-document.getElementById("teacherName").textContent = teacher.name;
-
-document.getElementById("today").textContent =
-  new Date().toDateString();
-
-const db = JSON.parse(localStorage.getItem("DB"));
-const myClasses = db.classes.filter(
-  c => c.teacherEmail === teacher.email
-);
-
-const container = document.getElementById("classes");
-
-if (myClasses.length === 0) {
-  container.innerHTML = `
-    <div class="card">
-      <h3>No classes assigned</h3>
-      <p>Please contact the administrator.</p>
-    </div>
-  `;
-}
-
-myClasses.forEach(cls => {
-  const students = db.students.filter(s => s.classId === cls.id);
-
-  container.innerHTML += `
-    <div class="card" style="margin-bottom:25px">
-      <h2>
-        ${cls.name}
-        <span class="badge">${students.length} students</span>
-      </h2>
-
-      <div style="margin-top:15px">
-        ${students.map(s => `
-          <div class="student-row">
-            <span class="student-name">${s.name}</span>
-            <input type="checkbox"
-              class="attendance-toggle"
-              onchange="markAttendance('${cls.id}','${s.id}',this.checked)">
-          </div>
-        `).join("")}
-      </div>
-    </div>
-  `;
+auth.onAuthStateChanged(user => {
+  db.collection("classes")
+    .where("teacherEmail", "==", user.email)
+    .onSnapshot(snapshot => {
+      document.getElementById("classes").innerHTML = "";
+      snapshot.forEach(cls => {
+        document.getElementById("classes").innerHTML += `
+          <div class="card">
+            <h3>${cls.data().name}</h3>
+          </div>`;
+      });
+    });
 });
-
-function markAttendance(classId, studentId, present) {
-  const today = new Date().toISOString().slice(0,10);
-  const db = JSON.parse(localStorage.getItem("DB"));
-
-  db.attendance.push({
-    classId,
-    studentId,
-    date: today,
-    present
-  });
-
-  localStorage.setItem("DB", JSON.stringify(db));
-}
 </script>
-
 </body>
 </html>
