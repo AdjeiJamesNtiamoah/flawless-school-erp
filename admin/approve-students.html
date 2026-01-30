@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Approve Students</title>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<script src="../core/permissions.js"></script>
+<script>checkAccess("admin");</script>
+
+<div class="layout">
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a href="admin-dashboard.html">Dashboard</a>
+    <a class="active" href="#">Approve Students</a>
+  </div>
+
+  <div class="main">
+    <h1>Pending Student Approvals</h1>
+    <div id="list"></div>
+  </div>
+</div>
+
+<script>
+const db = JSON.parse(localStorage.getItem("DB"));
+const list = document.getElementById("list");
+
+function render() {
+  list.innerHTML = "";
+  db.students.filter(s => !s.approved).forEach(s => {
+    list.innerHTML += `
+      <div class="card">
+        <b>${s.name}</b>
+        <button onclick="approve('${s.id}')">Approve</button>
+      </div>`;
+  });
+}
+
+function approve(id) {
+  const student = db.students.find(s => s.id === id);
+  student.approved = true;
+  createStudentLogin(student);
+  localStorage.setItem("DB", JSON.stringify(db));
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
