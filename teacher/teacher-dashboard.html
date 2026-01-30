@@ -9,26 +9,43 @@
 <script src="../core/firebase.js"></script>
 <script src="../core/auth.js"></script>
 
-<h1>Teacher Dashboard</h1>
-<a href="register-student.html">Register Student</a>
-<button onclick="logout()">Logout</button>
+<div class="layout">
 
-<div id="classes"></div>
+  <div class="sidebar">
+    <h2>Teacher Panel</h2>
+    <a class="active">Dashboard</a>
+    <a href="register-student.html">Register Student</a>
+    <a onclick="logout()">Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div>
+        <h1>My Classes</h1>
+        <p>Teacher Dashboard</p>
+      </div>
+    </div>
+
+    <div id="classes"></div>
+  </div>
+</div>
 
 <script>
 auth.onAuthStateChanged(user => {
   db.collection("classes")
-    .where("teacherEmail", "==", user.email)
+    .where("teacherEmail","==",user.email)
     .onSnapshot(snapshot => {
-      document.getElementById("classes").innerHTML = "";
+      classes.innerHTML = "";
       snapshot.forEach(cls => {
-        document.getElementById("classes").innerHTML += `
+        classes.innerHTML += `
           <div class="card">
             <h3>${cls.data().name}</h3>
+            <span class="badge">Assigned Class</span>
           </div>`;
       });
     });
 });
 </script>
+
 </body>
 </html>
