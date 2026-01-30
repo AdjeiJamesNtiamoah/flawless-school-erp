@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register Student | Teacher</title>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<script src="../core/permissions.js"></script>
+<script>checkAccess("teacher");</script>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>Teacher Panel</h2>
+    <a href="teacher-dashboard.html">Dashboard</a>
+    <a class="active" href="#">Register Student</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="header">
+      <h1>Register Student</h1>
+      <p>Add student to your class</p>
+    </div>
+
+    <div class="card" style="max-width:500px">
+      <form id="studentForm">
+
+        <label>Student Full Name</label>
+        <input required id="name">
+
+        <label>Gender</label>
+        <select id="gender">
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+
+        <label>Date of Birth</label>
+        <input type="date" id="dob">
+
+        <button type="submit">Register Student</button>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script src="../core/auth.js"></script>
+
+<script>
+const teacher = JSON.parse(localStorage.getItem("currentUser"));
+const db = JSON.parse(localStorage.getItem("DB"));
+
+const myClass = db.classes.find(
+  c => c.teacherEmail === teacher.email
+);
+
+if (!myClass) {
+  alert("No class assigned to you.");
+  location.href = "teacher-dashboard.html";
+}
+
+document.getElementById("studentForm").onsubmit = e => {
+  e.preventDefault();
+
+  db.students.push({
+    id: "stu_" + Date.now(),
+    name: document.getElementById("name").value,
+    gender: document.getElementById("gender").value,
+    dob: document.getElementById("dob").value,
+    classId: myClass.id,
+    registeredBy: teacher.email
+  });
+
+  localStorage.setItem("DB", JSON.stringify(db));
+  alert("Student registered successfully!");
+  e.target.reset();
+};
+</script>
+
+</body>
+</html>
