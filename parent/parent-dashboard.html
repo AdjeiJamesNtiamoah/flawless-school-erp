@@ -1,27 +1,45 @@
 <!DOCTYPE html>
 <html>
-<head><title>Parent Dashboard</title></head>
+<head>
+  <title>Parent Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
 <body>
 
 <script src="../core/firebase.js"></script>
 <script src="../core/auth.js"></script>
 
-<h1>Parent Dashboard</h1>
-<button onclick="logout()">Logout</button>
+<div class="layout">
 
-<div id="child"></div>
+  <div class="sidebar">
+    <h2>Parent</h2>
+    <a class="active">Dashboard</a>
+    <a onclick="logout()">Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <h1>Child Overview</h1>
+    </div>
+
+    <div class="card" id="child"></div>
+  </div>
+</div>
 
 <script>
 auth.onAuthStateChanged(user => {
   db.collection("users")
-    .where("email", "==", user.email)
+    .where("email","==",user.email)
     .get()
-    .then(snapshot => {
-      const parent = snapshot.docs[0].data();
+    .then(snap => {
+      const parent = snap.docs[0].data();
       return db.collection("students").doc(parent.studentId).get();
     })
     .then(doc => {
-      child.innerHTML = `<h3>${doc.data().name}</h3>`;
+      child.innerHTML = `
+        <h3>${doc.data().name}</h3>
+        <p>Linked Student</p>
+      `;
     });
 });
 </script>
