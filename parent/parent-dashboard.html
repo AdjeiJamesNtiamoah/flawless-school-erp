@@ -1,3 +1,30 @@
-<script src="../core/permissions.js"></script>
-<script>checkAccess("parent");</script>
+<!DOCTYPE html>
+<html>
+<head><title>Parent Dashboard</title></head>
+<body>
 
+<script src="../core/firebase.js"></script>
+<script src="../core/auth.js"></script>
+
+<h1>Parent Dashboard</h1>
+<button onclick="logout()">Logout</button>
+
+<div id="child"></div>
+
+<script>
+auth.onAuthStateChanged(user => {
+  db.collection("users")
+    .where("email", "==", user.email)
+    .get()
+    .then(snapshot => {
+      const parent = snapshot.docs[0].data();
+      return db.collection("students").doc(parent.studentId).get();
+    })
+    .then(doc => {
+      child.innerHTML = `<h3>${doc.data().name}</h3>`;
+    });
+});
+</script>
+
+</body>
+</html>
