@@ -1,6 +1,20 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /students/{id} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.role == "teacher";
+    }
+
+    match /users/{id} {
+      allow read, write: if request.auth.token.role == "admin";
+    }
+  }
+}
 
 <script type="module">
   // Import the functions you need from the SDKs you need
