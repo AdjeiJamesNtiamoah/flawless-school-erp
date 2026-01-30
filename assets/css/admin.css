@@ -111,3 +111,32 @@ th {
   background: #f8fafc;
   text-align: left;
 }
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  background: #e0e7ff;
+  color: #1e3a8a;
+  margin-left: 8px;
+}
+
+.student-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.student-row:last-child {
+  border-bottom: none;
+}
+
+.student-name {
+  font-weight: 500;
+}
+
+.attendance-toggle {
+  transform: scale(1.2);
+}
+
