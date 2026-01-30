@@ -2,15 +2,37 @@
 <html>
 <head>
   <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
 
 <script src="../core/firebase.js"></script>
 <script src="../core/auth.js"></script>
 
-<h1>Admin Dashboard</h1>
-<a href="approve-students.html">Approve Students</a>
-<button onclick="logout()">Logout</button>
+<div class="layout">
+
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a class="active">Dashboard</a>
+    <a href="approve-students.html">Approve Students</a>
+    <a onclick="logout()">Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div>
+        <h1>Administrator</h1>
+        <p>System overview</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Welcome to Flawless School ERP</h3>
+      <p>Manage teachers, students and approvals.</p>
+    </div>
+
+  </div>
+</div>
 
 </body>
 </html>
