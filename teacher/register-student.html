@@ -52,8 +52,33 @@
 <script src="../core/auth.js"></script>
 
 <script>
-const teacher = JSON.parse(localStorage.getItem("currentUser"));
-const db = JSON.parse(localStorage.getItem("DB"));
+auth.onAuthStateChanged(user => {
+  if (!user) return;
+
+  db.collection("classes")
+    .where("teacherEmail", "==", user.email)
+    .get()
+    .then(snapshot => {
+      const myClass = snapshot.docs[0];
+
+      studentForm.onsubmit = e => {
+        e.preventDefault();
+
+        db.collection("students").add({
+          name: name.value,
+          gender: gender.value,
+          dob: dob.value,
+          classId: myClass.id,
+          teacherEmail: user.email,
+          approved: false,
+          createdAt: new Date()
+        });
+
+        alert("Student registered (pending approval)");
+        studentForm.reset();
+      };
+    });
+});
 
 const myClass = db.classes.find(c => c.teacherEmail === teacher.email);
 if (!myClass) {
