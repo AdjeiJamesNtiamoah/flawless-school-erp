@@ -1,3 +1,27 @@
-<script src="../core/permissions.js"></script>
-<script>checkAccess("student");</script>
+<!DOCTYPE html>
+<html>
+<head><title>Student Dashboard</title></head>
+<body>
 
+<script src="../core/firebase.js"></script>
+<script src="../core/auth.js"></script>
+
+<h1>Student Dashboard</h1>
+<button onclick="logout()">Logout</button>
+
+<div id="info"></div>
+
+<script>
+auth.onAuthStateChanged(user => {
+  db.collection("students")
+    .where("studentEmail", "==", user.email)
+    .onSnapshot(snapshot => {
+      snapshot.forEach(doc => {
+        info.innerHTML = `<h3>${doc.data().name}</h3>`;
+      });
+    });
+});
+</script>
+
+</body>
+</html>
