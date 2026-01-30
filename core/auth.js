@@ -1,23 +1,18 @@
-function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const db = JSON.parse(localStorage.getItem("DB"));
-  const user = db.users.find(
-    u => u.email === email && u.password === password
-  );
-
-  if (!user) {
-    alert("Invalid login details");
-    return;
-  }
-
-  localStorage.setItem("currentUser", JSON.stringify(user));
-  routeUser(user.role);
+function login(email, password) {
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      return db.collection("users").where("email", "==", email).get();
+    })
+    .then(snapshot => {
+      const user = snapshot.docs[0].data();
+      if (user.role === "admin") location.href = "admin/admin-dashboard.html";
+      if (user.role === "teacher") location.href = "teacher/teacher-dashboard.html";
+      if (user.role === "student") location.href = "student/student-dashboard.html";
+      if (user.role === "parent") location.href = "parent/parent-dashboard.html";
+    })
+    .catch(err => alert(err.message));
 }
 
 function logout() {
-  localStorage.removeItem("currentUser");
-  location.href = "../auth/login.html";
+  auth.signOut().then(() => location.href = "../index.html");
 }
-
