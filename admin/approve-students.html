@@ -44,6 +44,9 @@ function approve(id) {
   localStorage.setItem("DB", JSON.stringify(db));
   render();
 }
+db.collection("students")
+  .doc(studentId)
+  .update({ approved: true });
 
 render();
 </script>
