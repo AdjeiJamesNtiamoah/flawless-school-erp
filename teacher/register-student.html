@@ -55,32 +55,71 @@
 const teacher = JSON.parse(localStorage.getItem("currentUser"));
 const db = JSON.parse(localStorage.getItem("DB"));
 
-const myClass = db.classes.find(
-  c => c.teacherEmail === teacher.email
-);
-
+const myClass = db.classes.find(c => c.teacherEmail === teacher.email);
 if (!myClass) {
-  alert("No class assigned to you.");
+  alert("No class assigned.");
   location.href = "teacher-dashboard.html";
 }
 
-document.getElementById("studentForm").onsubmit = e => {
+const form = document.getElementById("studentForm");
+const list = document.createElement("div");
+document.querySelector(".card").appendChild(list);
+
+function render() {
+  list.innerHTML = "<h3>My Students</h3>";
+  db.students
+    .filter(s => s.classId === myClass.id)
+    .forEach(s => {
+      list.innerHTML += `
+        <div class="student-row">
+          <span>${s.name} ${s.approved ? "✔️" : "(Pending)"}</span>
+          <span>
+            <button onclick="edit('${s.id}')">Edit</button>
+            <button onclick="remove('${s.id}')">Delete</button>
+          </span>
+        </div>`;
+    });
+}
+
+form.onsubmit = e => {
   e.preventDefault();
+  const name = document.getElementById("name").value;
 
   db.students.push({
     id: "stu_" + Date.now(),
-    name: document.getElementById("name").value,
-    gender: document.getElementById("gender").value,
-    dob: document.getElementById("dob").value,
+    name,
+    gender: gender.value,
+    dob: dob.value,
     classId: myClass.id,
-    registeredBy: teacher.email
+    registeredBy: teacher.email,
+    approved: false
   });
 
   localStorage.setItem("DB", JSON.stringify(db));
-  alert("Student registered successfully!");
-  e.target.reset();
+  form.reset();
+  render();
 };
+
+function edit(id) {
+  const s = db.students.find(x => x.id === id);
+  const newName = prompt("Edit student name", s.name);
+  if (newName) {
+    s.name = newName;
+    localStorage.setItem("DB", JSON.stringify(db));
+    render();
+  }
+}
+
+function remove(id) {
+  if (!confirm("Delete student?")) return;
+  db.students = db.students.filter(s => s.id !== id);
+  localStorage.setItem("DB", JSON.stringify(db));
+  render();
+}
+
+render();
 </script>
+
 
 </body>
 </html>
