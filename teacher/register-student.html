@@ -1,69 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Register Student | Teacher</title>
-  <link rel="stylesheet" href="../assets/css/admin.css">
+  <title>Register Student</title>
 </head>
 <body>
 
-<script src="../core/permissions.js"></script>
-<script>checkAccess("teacher");</script>
+<script src="../core/firebase.js"></script>
 
-<div class="layout">
+<h2>Register Student</h2>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h2>Teacher Panel</h2>
-    <a href="teacher-dashboard.html">Dashboard</a>
-    <a class="active" href="#">Register Student</a>
-    <a href="#" onclick="logout()">Logout</a>
-  </div>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="header">
-      <h1>Register Student</h1>
-      <p>Add student to your class</p>
-    </div>
-
-    <div class="card" style="max-width:500px">
-      <form id="studentForm">
-
-        <label>Student Full Name</label>
-        <input required id="name">
-
-        <label>Gender</label>
-        <select id="gender">
-          <option>Male</option>
-          <option>Female</option>
-        </select>
-
-        <label>Date of Birth</label>
-        <input type="date" id="dob">
-
-        <button type="submit">Register Student</button>
-
-      </form>
-    </div>
-
-  </div>
-</div>
-
-<script src="../core/auth.js"></script>
+<form id="form">
+  <input id="name" placeholder="Student Name" required>
+  <select id="gender">
+    <option>Male</option>
+    <option>Female</option>
+  </select>
+  <input type="date" id="dob">
+  <button>Register</button>
+</form>
 
 <script>
 auth.onAuthStateChanged(user => {
-  if (!user) return;
-
   db.collection("classes")
     .where("teacherEmail", "==", user.email)
     .get()
     .then(snapshot => {
       const myClass = snapshot.docs[0];
 
-      studentForm.onsubmit = e => {
+      form.onsubmit = e => {
         e.preventDefault();
-
         db.collection("students").add({
           name: name.value,
           gender: gender.value,
@@ -73,79 +38,12 @@ auth.onAuthStateChanged(user => {
           approved: false,
           createdAt: new Date()
         });
-
         alert("Student registered (pending approval)");
-        studentForm.reset();
+        form.reset();
       };
     });
 });
-
-const myClass = db.classes.find(c => c.teacherEmail === teacher.email);
-if (!myClass) {
-  alert("No class assigned.");
-  location.href = "teacher-dashboard.html";
-}
-
-const form = document.getElementById("studentForm");
-const list = document.createElement("div");
-document.querySelector(".card").appendChild(list);
-
-function render() {
-  list.innerHTML = "<h3>My Students</h3>";
-  db.students
-    .filter(s => s.classId === myClass.id)
-    .forEach(s => {
-      list.innerHTML += `
-        <div class="student-row">
-          <span>${s.name} ${s.approved ? "✔️" : "(Pending)"}</span>
-          <span>
-            <button onclick="edit('${s.id}')">Edit</button>
-            <button onclick="remove('${s.id}')">Delete</button>
-          </span>
-        </div>`;
-    });
-}
-
-form.onsubmit = e => {
-  e.preventDefault();
-  const name = document.getElementById("name").value;
-
- db.collection("students").add({
-  name,
-  gender,
-  dob,
-  classId,
-  approved: false,
-  teacherEmail: teacher.email,
-  createdAt: new Date()
-});
-
-
-  localStorage.setItem("DB", JSON.stringify(db));
-  form.reset();
-  render();
-};
-
-function edit(id) {
-  const s = db.students.find(x => x.id === id);
-  const newName = prompt("Edit student name", s.name);
-  if (newName) {
-    s.name = newName;
-    localStorage.setItem("DB", JSON.stringify(db));
-    render();
-  }
-}
-
-function remove(id) {
-  if (!confirm("Delete student?")) return;
-  db.students = db.students.filter(s => s.id !== id);
-  localStorage.setItem("DB", JSON.stringify(db));
-  render();
-}
-
-render();
 </script>
-
 
 </body>
 </html>
