@@ -1,3 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
 <script src="../core/permissions.js"></script>
 <script>checkAccess("teacher");</script>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>Teacher Panel</h2>
+    <a class="active" href="#">My Classes</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="header">
+      <h1>My Classes</h1>
+      <p>Welcome, <b id="teacherName"></b></p>
+    </div>
+
+    <div id="classes"></div>
+
+  </div>
+</div>
+
+<script src="../core/datastore.js"></script>
+<script src="../core/auth.js"></script>
+
+<script>
+const teacher = JSON.parse(localStorage.getItem("currentUser"));
+document.getElementById("teacherName").textContent = teacher.name;
+
+const db = JSON.parse(localStorage.getItem("DB"));
+
+const myClasses = db.classes.filter(
+  c => c.teacherEmail === teacher.email
+);
+
+const container = document.getElementById("classes");
+
+if (myClasses.length === 0) {
+  container.innerHTML = "<p>No classes assigned</p>";
+}
+
+myClasses.forEach(cls => {
+  const students = db.students.filter(s => s.classId === cls.id);
+
+  container.innerHTML += `
+    <div class="card" style="margin-bottom:20px">
+      <h3>${cls.name}</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Present</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${students.map(s => `
+            <tr>
+              <td>${s.name}</td>
+              <td>
+                <input type="checkbox"
+                  onchange="markAttendance('${cls.id}','${s.id}',this.checked)">
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+});
+
+function markAttendance(classId, studentId, present) {
+  const today = new Date().toISOString().slice(0,10);
+  const db = JSON.parse(localStorage.getItem("DB"));
+
+  db.attendance.push({
+    classId,
+    studentId,
+    date: today,
+    present
+  });
+
+  localStorage.setItem("DB", JSON.stringify(db));
+}
+</script>
+
+</body>
+</html>
+
 
