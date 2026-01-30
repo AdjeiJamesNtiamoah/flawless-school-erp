@@ -47,6 +47,40 @@ function approve(id) {
 db.collection("students")
   .doc(studentId)
   .update({ approved: true });
+db.collection("students")
+  .where("approved", "==", false)
+  .onSnapshot(snapshot => {
+    list.innerHTML = "";
+    snapshot.forEach(doc => {
+      const s = doc.data();
+      list.innerHTML += `
+        <div class="card">
+          <b>${s.name}</b>
+          <button onclick="approve('${doc.id}','${s.name}')">Approve</button>
+        </div>`;
+    });
+  });
+
+function approve(id, name) {
+  const email = name.toLowerCase().replace(/\s/g,"") + "@school.com";
+  const password = "student123";
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      return db.collection("users").add({
+        name,
+        email,
+        role: "student"
+      });
+    })
+    .then(() => {
+      return db.collection("students").doc(id).update({
+        approved: true,
+        studentEmail: email
+      });
+    })
+    .then(() => alert("Student approved & login created"));
+}
 
 render();
 </script>
