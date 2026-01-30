@@ -76,6 +76,21 @@
   document.getElementById("totalTeachers").textContent =
     db.users.filter(u => u.role === "teacher").length;
 </script>
+<script>
+function createStudentLogin(student) {
+  const email = student.name.toLowerCase().replace(/\s/g,"") + "@school.com";
+  const password = "student123";
+
+  student.studentEmail = email;
+
+  db.users.push({
+    role: "student",
+    name: student.name,
+    email,
+    password
+  });
+}
+</script>
 
 </body>
 </html>
