@@ -85,15 +85,16 @@ form.onsubmit = e => {
   e.preventDefault();
   const name = document.getElementById("name").value;
 
-  db.students.push({
-    id: "stu_" + Date.now(),
-    name,
-    gender: gender.value,
-    dob: dob.value,
-    classId: myClass.id,
-    registeredBy: teacher.email,
-    approved: false
-  });
+ db.collection("students").add({
+  name,
+  gender,
+  dob,
+  classId,
+  approved: false,
+  teacherEmail: teacher.email,
+  createdAt: new Date()
+});
+
 
   localStorage.setItem("DB", JSON.stringify(db));
   form.reset();
